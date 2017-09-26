@@ -4,18 +4,24 @@ let id = 0;
 module.exports = {
   create: ( req, res ) => {
     const { text, time } = req.body;
-    messages.push({ id, text, time });
+    const message = { id, text, time };
+    console.log(req.session.user.messages);
+    messages.push(message);
+    //ALSO add to sessions
+    
+    req.session.user.messages.push(message)
     id++;
-    res.status(200).send( messages );
+    res.status(200).send( message );
   },
 
   read: ( req, res ) => {
     res.status(200).send( messages );
   },
 
+  // 
   update: ( req, res ) => {
     const { text } = req.body;
-    const updateID = req.params.id;
+    const updateID = req.query.id;
     const messageIndex = messages.findIndex( message => message.id == updateID );
     let message = messages[ messageIndex ];
 
@@ -29,9 +35,14 @@ module.exports = {
   },
 
   delete: ( req, res ) => {
-    const deleteID = req.params.id;
+    const deleteID = req.query.id;
     messageIndex = messages.findIndex( message => message.id == deleteID );
     messages.splice(messageIndex, 1);
     res.status(200).send( messages );
+  },
+
+  history: ( req, res ) => {
+    res.status(200).send( req.session.user.messages );
   }
+
 };
